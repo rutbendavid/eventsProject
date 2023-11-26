@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <style>
+        body{
+            font-family:'Segoe Script';
+            color:darkslategrey;
+        }
+        h1{
+            text-align:center;
+            font-size:250%;
+            color:black;
+        }
+        button {
+            color:black;
+            font-family: 'Segoe Script';
+            margin-bottom: 1%;
+            font-size: 100%;
+            background-color:white;
+            border:1px gray solid;
+            border-radius:2px;
+        }
+            button:hover {
+                background-color: #75818c;
+                ;
+            }
+        span{
+            display:inline;
+        }
+        select{
+            width:15%;
+        }
+    </style>
+    <title></title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+    <script>
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth'
+            });
+            calendar.render();
+        });
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            axios.get(`https://localhost:7188/api/Events`).then((res) => {
+                var calendarEl = document.getElementById("calendar");
+                var calendar = new FullCalendar.Calendar(calendarEl, {
+                    initialView: "dayGridMonth",
+                    events: res.data,
+                });
+                calendar.render();
+            });
+        });
+    </script>
+
+</head>
+<body onload="loud()">
+    <h1>API Requests</h1>
+    <button style="padding-left: 36%; padding-right:36%" onclick="postEvent()">post</button>
+    <span>
+        <input placeholder="title" />
+        <input type="date" />
+    </span>
+    <br />
+    <button style="padding-left: 27.8%; padding-right:29%"  onclick="putEvent()">put</button>
+    <span>
+        <select class="s"></select>
+        <input placeholder="title" />
+        <input type="date" />
+    </span>
+    <br />
+    <button style="padding-left: 39%; padding-right:40%" onclick="deleteEvent()">delete</button>
+    <span>
+        <select style="width:8%" class="s"></select>
+    </span>
+    <div id="requestsResult"></div>
+    <div style="width:75%;margin:0 auto" id='calendar' ></div>
+    <script>
+        function loud() {
+            axios.get(`https://localhost:7188/api/Events`)
+                .then(function (response) {
+                    var events = response.data;
+                    events.forEach(function (event) {
+                        var option = document.createElement('option');
+                        option.value = event.id;
+                        option.text = event.id + " " + event.title;
+                        document.getElementsByClassName('s')[0].appendChild(option);
+                    });
+
+                });
+            axios.get(`https://localhost:7188/api/Events`)
+                .then(function (response) {
+                    var events = response.data;
+                    events.forEach(function (event) {
+                        var option = document.createElement('option');
+                        option.value = event.id;
+                        option.text = event.id + " " + event.title;
+                        document.getElementsByClassName('s')[1].appendChild(option);
+                    });
+
+                });
+        }
+        function postEvent() {
+            var t = document.getElementsByTagName("input")[0].value;
+            var s = document.getElementsByTagName("input")[1].value;
+            axios.post(`https://localhost:7188/api/Events`, {
+                title: t,
+                start: s,
+                end: s
+            })
+                .then((res) => {
+                    this.location.reload();
+                })
+        }
+        function putEvent() {
+            var id = document.getElementsByClassName("s")[0].options[document.getElementsByClassName("s")[0].selectedIndex].value;
+            var t = document.getElementsByTagName("input")[2].value;
+            var s = document.getElementsByTagName("input")[3].value;
+            axios.put(`https://localhost:7188/api/Events/${id}`, {
+                title: t,
+                start: s,
+                end: s
+            })
+                .then((res) => {
+                    this.location.reload();
+                })
+        }
+        function deleteEvent() {
+            let id = document.getElementsByClassName("s")[1].options[document.getElementsByClassName("s")[1].selectedIndex].value;
+            axios.delete(`https://localhost:7188/api/Events/${id}`, {
+            })
+                .then((res) => {
+                    this.location.reload();
+                })
+        }
+    </script>
+</body>
+</html>
